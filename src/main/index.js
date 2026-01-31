@@ -34,12 +34,13 @@ function createWindow() {
         height: 900,
         minWidth: 1200,
         minHeight: 700,
+        title: 'SpaceHound',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js')
         },
-        backgroundColor: '#0f0f0f',
+        backgroundColor: '#0a0a0f',
         show: false // Show after ready
     });
 
@@ -218,6 +219,14 @@ async function performScan(targetPath) {
  */
 ipcMain.handle('scan-drive', async (event, targetPath) => {
     try {
+        // Check if components are initialized
+        if (!scanner || !ownershipMapper || !residueDetector || !safetyClassifier) {
+            return {
+                success: false,
+                error: 'Components not initialized yet. Please wait a moment and try again.'
+            };
+        }
+
         const result = await performScan(targetPath);
         return { success: true, data: result };
     } catch (error) {

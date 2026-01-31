@@ -1,7 +1,7 @@
 {
-  "name": "clearner",
+  "name": "spacehound",
   "version": "1.0.0",
-  "description": "Intelligent disk space recovery tool - Find and safely delete leftover data from uninstalled apps",
+  "description": "SpaceHound - Sniff out hidden disk space and safely reclaim gigabytes",
   "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
@@ -25,7 +25,7 @@
     "safe",
     "delete"
   ],
-  "author": "Clearner Team",
+  "author": "SpaceHound Team",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^9.2.2",
@@ -40,8 +40,8 @@
     "jest": "^29.7.0"
   },
   "build": {
-    "appId": "com.clearner.app",
-    "productName": "Clearner",
+    "appId": "com.spacehound.app",
+    "productName": "SpaceHound",
     "directories": {
       "output": "dist"
     },
