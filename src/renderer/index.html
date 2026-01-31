@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Clearner - Intelligent disk space recovery tool">
+  <title>Clearner - Intelligent Disk Space Recovery</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" stroke="url(#gradient)" stroke-width="2"/>
+            <path d="M12 16L15 19L20 13" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#6366f1"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <h1>Clearner</h1>
+        </div>
+        <p class="tagline">Intelligent Space Recovery</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="overview">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Overview</span>
+        </button>
+
+        <button class="nav-item" data-view="biggest">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 17V7L10 3L17 7V17H3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <span>Biggest Folders</span>
+        </button>
+
+        <button class="nav-item" data-view="safe-cleanup">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Safe Cleanup</span>
+          <span class="badge" id="safe-count">0</span>
+        </button>
+
+        <button class="nav-item" data-view="leftovers">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Uninstalled Apps</span>
+          <span class="badge warning" id="residue-count">0</span>
+        </button>
+
+        <button class="nav-item" data-view="quarantine">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3V10M10 10L14 6M10 10L6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 10V15C4 16.1046 4.89543 17 6 17H14C15.1046 17 16 16.1046 16 15V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Recently Deleted</span>
+          <span class="badge info" id="quarantine-count">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="db-info">
+          <p class="db-label">Signature Database</p>
+          <p class="db-count" id="db-signature-count">Loading...</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Header -->
+      <header class="header">
+        <div class="scan-controls">
+          <select id="drive-select" class="drive-select">
+            <option value="C:\">C:\ (System Drive)</option>
+            <option value="D:\">D:\ Drive</option>
+            <option value="E:\">E:\ Drive</option>
+          </select>
+          <button id="scan-button" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C11.5 3 12.9 3.5 14 4.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Scan Drive</span>
+          </button>
+        </div>
+
+        <div class="header-stats" id="header-stats" style="display: none;">
+          <div class="stat-card">
+            <p class="stat-label">Total Scanned</p>
+            <p class="stat-value" id="total-size">0 GB</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Can Free Up</p>
+            <p class="stat-value highlight" id="safe-size">0 GB</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Leftover Data</p>
+            <p class="stat-value warning" id="residue-size">0 GB</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Views Container -->
+      <div class="views-container">
+        
+        <!-- Overview View -->
+        <div class="view active" id="view-overview">
+          <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-content">
+              <div class="welcome-icon">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="40" r="35" stroke="url(#gradient2)" stroke-width="3"/>
+                  <path d="M30 40L37 47L50 32" stroke="url(#gradient2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <defs>
+                    <linearGradient id="gradient2" x1="0" y1="0" x2="80" y2="80">
+                      <stop offset="0%" stop-color="#6366f1"/>
+                      <stop offset="100%" stop-color="#8b5cf6"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2>Find What's Taking Up Your Space</h2>
+              <p>Clearner identifies leftover data from uninstalled apps and helps you safely recover disk space.</p>
+              <ul class="feature-list">
+                <li>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="#6366f1" stroke-width="1.5"/>
+                    <path d="M7 10L9 12L13 8" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span>Detects leftover data from uninstalled applications</span>
+                </li>
+                <li>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="#6366f1" stroke-width="1.5"/>
+                    <path d="M7 10L9 12L13 8" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span>Explains what each folder is and why it exists</span>
+                </li>
+                <li>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="#6366f1" stroke-width="1.5"/>
+                    <path d="M7 10L9 12L13 8" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span>Safe deletion with 30-day undo period</span>
+                </li>
+              </ul>
+              <button class="btn btn-large btn-primary" id="start-scan-btn">
+                <span>Start Scanning</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="scan-progress" id="scan-progress" style="display: none;">
+            <div class="progress-content">
+              <div class="spinner"></div>
+              <h3 id="scan-status-title">Scanning Drive...</h3>
+              <p id="scan-status-message">Analyzing disk space...</p>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <p class="progress-detail" id="progress-detail">0 folders scanned</p>
+            </div>
+          </div>
+
+          <div class="overview-results" id="overview-results" style="display: none;">
+            <h2>Scan Results</h2>
+            <div class="results-grid">
+              <div class="result-card">
+                <h3>Safe to Delete</h3>
+                <p class="result-size" id="overview-safe-size">0 GB</p>
+                <p class="result-count" id="overview-safe-count">0 items</p>
+                <button class="btn btn-secondary" data-view-switch="safe-cleanup">View Details</button>
+              </div>
+              <div class="result-card">
+                <h3>Uninstalled Apps</h3>
+                <p class="result-size" id="overview-residue-size">0 GB</p>
+                <p class="result-count" id="overview-residue-count">0 items</p>
+                <button class="btn btn-secondary" data-view-switch="leftovers">View Details</button>
+              </div>
+              <div class="result-card">
+                <h3>Largest Folders</h3>
+                <p class="result-size" id="overview-largest-size">0 GB</p>
+                <p class="result-count" id="overview-largest-count">0 items</p>
+                <button class="btn btn-secondary" data-view-switch="biggest">View Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biggest Folders View -->
+        <div class="view" id="view-biggest">
+          <h2>Biggest Folders</h2>
+          <p class="view-description">Folders sorted by size, regardless of safety</p>
+          <div class="folder-list" id="biggest-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Safe Cleanup View -->
+        <div class="view" id="view-safe-cleanup">
+          <h2>Safe Cleanup</h2>
+          <p class="view-description">Folders that are safe to delete with high confidence</p>
+          <div class="bulk-actions">
+            <button class="btn btn-primary" id="delete-all-safe">
+              <span>Delete All Safe Items</span>
+            </button>
+          </div>
+          <div class="folder-list" id="safe-cleanup-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Leftovers View -->
+        <div class="view" id="view-leftovers">
+          <h2>Leftover Data from Uninstalled Apps</h2>
+          <p class="view-description">Data remaining from applications that are no longer installed</p>
+          <div class="folder-list" id="leftovers-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Quarantine View -->
+        <div class="view" id="view-quarantine">
+          <h2>Recently Deleted</h2>
+          <p class="view-description">Items in quarantine - can be restored within 30 days</p>
+          <div class="quarantine-stats" id="quarantine-stats">
+            <!-- Populated by JavaScript -->
+          </div>
+          <div class="folder-list" id="quarantine-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for folder details -->
+  <div class="modal" id="folder-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div id="modal-body">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/app.js"></script>
+</body>
+</html>
