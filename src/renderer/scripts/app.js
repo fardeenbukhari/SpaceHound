@@ -9,7 +9,8 @@ const state = {
     scanResults: [],
     currentView: 'overview',
     isScanning: false,
-    selectedDrive: 'C:\\'
+    selectedDrive: 'C:\\',
+    backendReady: false
 };
 
 // DOM elements
@@ -63,6 +64,12 @@ const elements = {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Disable scan buttons until backend is ready
+    elements.scanButton.disabled = true;
+    elements.startScanBtn.disabled = true;
+    elements.scanButton.innerHTML = '<span>Initializing...</span>';
+    elements.startScanBtn.innerHTML = '<span>Initializing...</span>';
+
     initializeEventListeners();
     loadDatabaseStats();
     loadQuarantineStats();
@@ -71,6 +78,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // Listen for backend ready
 window.clearnerAPI.onBackendReady(() => {
     console.log('[Frontend] Backend ready');
+    state.backendReady = true;
+
+    // Enable scan buttons
+    elements.scanButton.disabled = false;
+    elements.startScanBtn.disabled = false;
+
+    // Restore button content
+    elements.scanButton.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C11.5 3 12.9 3.5 14 4.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Scan Drive</span>
+    `;
+
+    elements.startScanBtn.innerHTML = `
+        <span>Start Scanning</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `;
 });
 
 function initializeEventListeners() {
